@@ -28,10 +28,6 @@ module.exports = {
     async delete(request, response) {
         const {id} = request.params;
 
-        // const products_del  = await connection('products')
-        //     .where('id', id)
-        //     .first();
-
         await connection('products').where('id', id).delete();
 
         return response.status(204).send();

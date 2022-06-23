@@ -3,14 +3,18 @@ const express = require('express');
 const UserController = require('./controllers/UserController');
 const ProductController = require('./controllers/ProductController');
 const OrderController = require('./controllers/OrderController');
+const LoginController = require('./controllers/LoginController');
 
 const connection = require('./database/connection');
 
 const routes = express.Router();
 
+require("dotenv-safe").config();
+const jwt = require('jsonwebtoken');
+
 // USERS
-// MOSTRA TODOS OS USUARIOS DO BANCO
-routes.get('/users', UserController.index);
+// MOSTRA TODOS OS USUARIOS DO BANCO  COM O JWT INCLUSO
+routes.get('/users', verifyJWT, UserController.index);
 // CHAMA O METODO DO CONTROLLER QUE CADASTRA O USUARIO
 routes.post('/users', UserController.create);
 
@@ -29,4 +33,22 @@ routes.get('/orders', OrderController.index);
 // CHAMA O METODO DO CONTROLLER QUE CADASTRA O PEDIDO AO SER FECHADO PELO USUARIO
 routes.post('/orders', OrderController.create);
 
+
+// LOGIN
+// FAZ O LOGIN DO USUARIO COM BASE NO ID
+routes.post('/login', LoginController.login);
+
 module.exports = routes;
+
+function verifyJWT(req, res, next) {
+    const token = req.headers['x-access-token'];
+    if (!token) return res.status(401).json({ auth: false, message: 'FALTA O TOKEN OTARO' });
+    
+    jwt.verify(token, process.env.SECRET, function(err, decoded) {
+      if (err) return res.status(500).json({ auth: false, message: 'BUGO O TOKEN' });
+      
+      // se tudo estiver ok, salva no request para uso posterior
+      req.userId = decoded.id;
+      next();
+    });
+}
