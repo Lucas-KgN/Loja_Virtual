@@ -13,9 +13,14 @@ module.exports = {
 
     // CRIA O USUARIO NO BANCO COM BASE NOS DADOS PASSADOS NO SITE
     async create(request, response) {
-        const { name, email, address, type } = request.body;
+        const { name, email, address } = request.body;
         const id = crypto.randomBytes(4).toString('HEX'); // CRIANDO O ID DO USUARIO NA MAO
-    
+        let type = 0;
+
+        if (email.indexOf("@admin.com") !== -1){
+            type = 1;
+        }
+
        await connection('users').insert({  // Salvando as informacoes no banco
             id,
             name,
