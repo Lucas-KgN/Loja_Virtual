@@ -4,9 +4,10 @@ import "./styles.css";
 import api from '../../services/api';
 
 export default function Carrinho() {
-    const products_list = localStorage.getItem('products_list');
+    const products_list = localStorage.getItem('products_list'); // Lista de IDS
     const userId = localStorage.getItem('userId');
-    const [products, setProducts] = useState([]);
+    let [products, setProducts] = useState([]);
+    let conter = 0;
 
     useEffect(() => {
         api.get('products', {
@@ -14,8 +15,18 @@ export default function Carrinho() {
             setProducts(response.data);
         })
     }, []);
+  
+    products = products.filter(person => products_list.includes(person.id));
 
-
+    function count(id){
+            conter = 0;
+            for (let j=0; j < products.length; j++){
+              if (id === products[j].id){
+                conter++;
+              }
+            }
+            return conter;
+    }
 
     return (
         <div className="carrinho-container">
@@ -25,14 +36,13 @@ export default function Carrinho() {
             </header>
             <h1>Meus Produtos</h1>
             <ul>
-
             {products.map(product => (
                     <li key={product.id}>
                         <strong>Produto:</strong>
                              <p>{product.name}</p>
                 
                         <strong>Quantidade:</strong>
-                            <p>{products.length}</p>
+                            <p>{count(product.id)}</p>
                 
                         <strong>Valor:</strong>
                             <p>{Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'}).format(product.value)}</p>
@@ -49,6 +59,25 @@ export default function Carrinho() {
         </div>
     );
 }
+
+
+
+    // function selectionProducts(item, index) {
+    //     for (let i = 0; i <= products.lenght; i++) {
+    //         if (index !== products_list[i]) {
+    //             <li key={item}>
+    //             <strong>Produto:</strong>
+    //                  <p>{item.name}</p>
+        
+    //             <strong>Quantidade:</strong>
+    //                 <p>{item.length}</p>
+        
+    //             <strong>Valor:</strong>
+    //                 <p>{Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'}).format(item.value)}</p>
+    //         </li>
+    //         }
+    //     }
+    // }
 
 
 // function calculate(product_item) {
