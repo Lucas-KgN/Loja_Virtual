@@ -7,7 +7,7 @@ export default function Carrinho() {
     const products_list = localStorage.getItem('products_list'); // Lista de IDS
     const userId = localStorage.getItem('userId');
     let [products, setProducts] = useState([]);
-    let conter = 0;
+    const counts = {};
 
     useEffect(() => {
         api.get('products', {
@@ -17,17 +17,30 @@ export default function Carrinho() {
     }, []);
   
     products = products.filter(person => products_list.includes(person.id));
+    
 
-    function count(id){
-            conter = 0;
-            for (let j=0; j < products.length; j++){
-              if (id === products[j].id){
-                conter++;
-              }
-            }
-            return conter;
+    function countproducts(){
+        for (const num of products_list) {
+            counts[num] = counts[num] ? counts[num] + 1 : 1;
+        }
+
+        console.log(counts)
     }
 
+    function verify(id){
+        return counts[id];
+    }
+
+    function finalValue() {
+        let sum = 0.0;
+
+        products.forEach(element => {
+            sum += element.value * verify(element.id);
+        });
+
+        return sum;
+    }
+    
     return (
         <div className="carrinho-container">
             <header>
@@ -36,16 +49,17 @@ export default function Carrinho() {
             </header>
             <h1>Meus Produtos</h1>
             <ul>
+            {countproducts()}
             {products.map(product => (
                     <li key={product.id}>
                         <strong>Produto:</strong>
                              <p>{product.name}</p>
                 
                         <strong>Quantidade:</strong>
-                            <p>{count(product.id)}</p>
+                            <p>{verify(product.id)}</p>
                 
                         <strong>Valor:</strong>
-                            <p>{Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'}).format(product.value)}</p>
+                            <p>{Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'}).format(product.value * verify(product.id))}</p>
                     </li>
                 ))}
             </ul>
@@ -53,7 +67,7 @@ export default function Carrinho() {
             <ul>
                 <li className="total">
                     <strong className="total">Valor Total:</strong>
-                    <p className="total">{Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'}).format(1050.00)}</p>
+                    <p className="total">{Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'}).format(finalValue())}</p>
                 </li>
             </ul>
         </div>
