@@ -1,5 +1,5 @@
 const connection = require('../database/connection');
-// const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 module.exports = {
 
@@ -12,12 +12,17 @@ module.exports = {
         .select('type')
         .first();
 
-        // if (user_real.email == email){
-        // const token = jwt.sign({ email }, process.env.SECRET, {
-        //     expiresIn: 300 // EXPIRA EM 5 MIN
-        // });
-        // return res.json({ auth: true, token: token });
-        // }
+        try {
+            if (user_real.id === id){
+                const token = jwt.sign({ id }, process.env.SECRET, {
+                    expiresIn: 900 // EXPIRA EM 5 MIN
+                });
+                return res.json({ auth: true, token: token });
+                }
+        } catch {
+            console.log('Insira seu ID por favor!');
+        }
+       
 
         return res.json(user_real);
     }

@@ -21,7 +21,7 @@ module.exports = {
             closed,
             productsclient,
         })
-    
-        return response.json({ user_id }); // Exibindo o id do usuario criado para confirmar que deu certo
+
+        return response.status(204).send()
     }
 };

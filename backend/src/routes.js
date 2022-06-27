@@ -1,4 +1,5 @@
 const express = require('express');
+const { celebrate, Segments, Joi } = require('celebrate');
 
 const UserController = require('./controllers/UserController');
 const ProductController = require('./controllers/ProductController');
@@ -16,14 +17,26 @@ const jwt = require('jsonwebtoken');
 // MOSTRA TODOS OS USUARIOS DO BANCO  COM O JWT INCLUSO
 routes.get('/users', UserController.index);
 // CHAMA O METODO DO CONTROLLER QUE CADASTRA O USUARIO
-routes.post('/users', UserController.create);
+routes.post('/users', celebrate({
+    [Segments.BODY]: Joi.object().keys({
+        name: Joi.string().required(),
+        email: Joi.string().required().email(),
+        address: Joi.string().required()
+    })
+}), UserController.create);
 
 
 //PRODUTOS
 // MOSTRA TODOS OS PRODUTOS DO BANCO
 routes.get('/products', ProductController.index);
 // CHAMA O METODO DO CONTROLLER QUE CADASTRA O PRODUTO
-routes.post('/products', ProductController.create); // ESPECIFICAMENTE SOMENTE PARA O CLIENTE ADMIN QUE CADASTRA PRODUTOS
+routes.post('/products', celebrate({
+    [Segments.BODY]: Joi.object().keys({
+        name: Joi.string().required(),
+        value: Joi.required(),
+        description: Joi.string().required()
+    })
+}), ProductController.create); // ESPECIFICAMENTE SOMENTE PARA O CLIENTE ADMIN QUE CADASTRA PRODUTOS
 // DELETA UM PRODUTO COM BASE NO SEU ID
 routes.delete('/products/:id', ProductController.delete);
 
@@ -40,15 +53,3 @@ routes.post('/login', LoginController.login);
 
 module.exports = routes;
 
-// function verifyJWT(req, res, next) {
-//     const token = req.headers['x-access-token'];
-//     if (!token) return res.status(401).json({ auth: false, message: 'FALTA O TOKEN OTARO' });
-    
-//     jwt.verify(token, process.env.SECRET, function(err, decoded) {
-//       if (err) return res.status(500).json({ auth: false, message: 'BUGO O TOKEN' });
-      
-//       // se tudo estiver ok, salva no request para uso posterior
-//       req.userId = decoded.id;
-//       next();
-//     });
-// }

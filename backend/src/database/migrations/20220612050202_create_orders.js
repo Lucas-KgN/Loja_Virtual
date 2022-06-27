@@ -5,8 +5,8 @@
 exports.up = function(knex) {
   return knex.schema.createTable('orders', function (table){
       table.increments();  // ID auto incremento
-      table.string('user_id').notNullable();
-      table.decimal('value').notNullable();
+      table.string('user_id');
+      table.decimal('value');
       table.string('closed').defaultTo(false);
       table.specificType('productsclient', 'TEXT[]');
     });
