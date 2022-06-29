@@ -58,7 +58,7 @@ export default function Carrinho() {
 
         try {
             const response = await api.post('orders', data)
-            alert('Deu certo!');
+            alert('Pedido feito com sucesso!');
 
             history.push('/profile');
         } catch(err){
